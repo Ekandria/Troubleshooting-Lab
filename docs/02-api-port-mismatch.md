@@ -16,40 +16,43 @@ In a customer-facing application, this could cause the website to load without d
 
 The client attempted:
 
-```bash
-curl http://localhost:5000/health
+</> bash
+
+```curl http://localhost:5000/health ```
+
 
 > curl: (7) Failed to connect to localhost port 5000
 
 ## Investigation
 
-1. Confirmed the connection failure
+### 1. Confirmed the connection failure
 
 The expected API endpoint on port 5000 could not be reached.
 
-
-2. Checked listening ports
+### 2. Checked listening ports
 
 The following command was used:
 
-...bash
-ss -ltnp
+</> bash
+
+``` ss -ltnp ```
 
 The Flask application was found listening on:
-127.0.0.1:5001
+> 127.0.0.1:5001
 
 instead of:
-127.0.0.1:5000
+> 127.0.0.1:5000
 
-
-3. Tested the actual listening port
+### 3. Tested the actual listening port
 
 The health endpoint was tested using port 5001:
 
-...bash
-curl -i http://localhost:5001/health
+</> bash
 
->HTTP/1.1 200 OK
+```curl -i http://localhost:5001/health ```
+
+
+> HTTP/1.1 200 OK
 
 This confirmed that the API itself was healthy.
 
@@ -61,8 +64,9 @@ The API port configuration did not match the port expected by the client.
 
 The Flask configuration was restored to the standard project port:
 
-...Python
-app.run(host="0.0.0.0", port=5000)
+</> Python
+
+``` app.run(host="0.0.0.0", port=5000) ```
 
 The API was restarted.
 
@@ -70,25 +74,32 @@ The API was restarted.
 
 The health endpoint was tested again:
 
-...bash
-curl http://localhost:5000/health
+</> bash
 
->{"status":"healthy"}
+``` curl http://localhost:5000/health ```
+
+
+> {"status":"healthy"}
 
 The client received:
-HTTP 200 OK
+> HTTP/1.1 200 OK
 
 ## Preventive Actions
 
 a. Keep service ports documented
+
 b. Use consistent configuration between clients and services
+
 c. Use environment variables or centralized configuration in larger deployments
+
 d. Verify listening ports after configuration changes
+
 e. Maintain health-check endpoints
 
 ## Tools Used
 
 a. Flask
+
 b. curl
 c. ss
 d. Linux / WSL
